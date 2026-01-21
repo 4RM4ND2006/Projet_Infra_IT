@@ -5,6 +5,10 @@ from urllib.request import urlopen
 from werkzeug.utils import secure_filename
 import sqlite3
 
+auth = request.authorization
+    if not auth or auth.username != 'user' or auth.password != '12345':
+        return make_response('Identifiants incorrects', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
+
 app = Flask(__name__)                                                                                                                  
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'  # Clé secrète pour les sessions
 
