@@ -20,6 +20,18 @@ def est_authentifie():
 def hello_world():
     return render_template('hello.html')
 
+@app.route('/recherche/<titre>')
+def recherche_livre(titre):
+    db = sqlite3.connect("database.db")
+    db.row_factory = sqlite3.Row
+    # On cherche un livre dont le titre ressemble à la recherche
+    livre = db.execute("SELECT * FROM livres WHERE titre LIKE ?", ('%' + titre + '%',)).fetchall()
+    db.close()
+    
+    # Transformation des résultats en liste pour l'API
+    resultats = [dict(row) for row in livre]
+    return {"livres_trouves": resultats}
+
 @app.route('/lecture')
 def lecture():
     if not est_authentifie():
