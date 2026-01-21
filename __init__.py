@@ -103,5 +103,41 @@ def fiche_nom(nom):
     con.close()
     return render_template("affichage_client.html", user=user)
 
+@app.route('/emprunter/<int:id_livre>')
+def emprunter(id_livre):
+    db = sqlite3.connect("database.db")
+    # On met à jour la colonne 'disponible' à 0 pour l'ID correspondant
+    db.execute("UPDATE livres SET disponible = 0 WHERE id = ?", (id_livre,))
+    db.commit()
+    db.close()
+    return {"message": f"Le livre {id_livre} a été emprunté avec succès."}
+
+@app.route('/supprimer_livre/<int:id_livre>')
+def supprimer_livre(id_livre):
+    db = sqlite3.connect("database.db")
+    # Commande SQL pour supprimer l'entrée
+    db.execute("DELETE FROM livres WHERE id = ?", (id_livre,))
+    db.commit()
+    db.close()
+    return {"message": f"Le livre {id_livre} a été supprimé de la bibliothèque."}
+
+@app.route('/etat_stocks')
+def etat_stocks():
+    db = sqlite3.connect("database.db")
+    cursor = db.cursor()
+    # On compte les lignes où disponible est égal à 1
+    cursor.execute("SELECT COUNT(*) FROM livres WHERE disponible = 1")
+    disponibles = cursor.fetchone()[0]
+    
+    cursor.execute("SELECT COUNT(*) FROM livres WHERE disponible = 0")
+    empruntes = cursor.fetchone()[0]
+    
+    db.close()
+    return {
+        "livres_disponibles": disponibles,
+        "livres_empruntes": empruntes,
+        "total": disponibles + empruntes
+    }
+
 if __name__ == "__main__":
   app.run(debug=True)
