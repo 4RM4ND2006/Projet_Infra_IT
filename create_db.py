@@ -1,25 +1,24 @@
 import sqlite3
 
 connection = sqlite3.connect('database.db')
-cursor = connection.cursor()
 
-# On supprime l'ancienne table si elle existe pour repartir de zéro
-cursor.execute("DROP TABLE IF EXISTS livres")
+with open('schema.sql') as f:
+    connection.executescript(f.read())
 
-# Ta commande SQL pour créer la table
-cursor.execute("""
-CREATE TABLE livres (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    titre TEXT NOT NULL,
-    auteur TEXT NOT NULL,
-    disponible INTEGER DEFAULT 1
-)
-""")
+cur = connection.cursor()
 
-# Optionnel : Ajoute quelques livres de test pour voir si ça marche
-cursor.execute("INSERT INTO livres (titre, auteur, disponible) VALUES (?, ?, ?)", ('Le Petit Prince', 'Antoine de Saint-Exupéry', 1))
-cursor.execute("INSERT INTO livres (titre, auteur, disponible) VALUES (?, ?, ?)", ('1984', 'George Orwell', 1))
+cur.execute("INSERT INTO livres (titre, auteur) VALUES (?, ?)", 
+            ('Le Petit Prince', 'Antoine de Saint-Exupéry'))
+cur.execute("INSERT INTO livres (titre, auteur) VALUES (?, ?)", 
+            ('1984', 'George Orwell'))
+cur.execute("INSERT INTO livres (titre, auteur) VALUES (?, ?)", 
+            ('Le Seigneur des Anneaux', 'J.R.R. Tolkien'))
+cur.execute("INSERT INTO livres (titre, auteur) VALUES (?, ?)", 
+            ('L''Étranger', 'Albert Camus'))
+cur.execute("INSERT INTO livres (titre, auteur) VALUES (?, ?)", 
+            ('Harry Potter à l''école des sorciers', 'J.K. Rowling'))
 
 connection.commit()
 connection.close()
-print("Base de données bibliothèque initialisée !")
+
+print("Base de données initialisée avec succès avec la table 'livres' !")
